@@ -1,12 +1,13 @@
 #!/usr/bin/env python
-
-import random
-import math
 import argparse
+import locale
+import math
+import random
 import re
 
 from collections import Counter
 
+locale.setlocale(locale.LC_ALL, '')
 
 def generate(words, how_many=4):
     return ' '.join([random.choice(words) for _ in range(how_many)])
@@ -80,12 +81,12 @@ def main():
 
         print(u'\nFound alphabet of {:n} characters:\n'.format(len(char_counter)))
         for k, v in sorted(char_counter.items()):
-            print(u'{} {:>5n}'.format(k, v))
+            print(u'{} {:>6n}'.format(k, v))
 
         word_count = len(words)
         print(u'\nFound {:n} words\n'.format(word_count))
 
-        fmt = u'{:>3n} {:>3n} {:>7} {}'
+        fmt = u'{:>3n} {:>3n} {:>8} {}'
         header = u'E1  E2  TTC      PASSWORD'
         print(header)
         print(u'-'*len(header))

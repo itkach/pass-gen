@@ -38,10 +38,13 @@ def main():
 
         print "Found %d words" % word_count
 
+        print "e1\te2\tpassword"
+
         for k in range(1, 6):
-            passwd = generate(words, how_many=k)
+            password = generate(words, how_many=k)
             entropy = int(math.log(word_count**k, 2))
-            print k, entropy, '\t', passwd
+            entropy2 = int(math.log(27**len(password), 2))
+            print '{}\t{}\t{}'.format(entropy, entropy2, password)
 
 
 if __name__ == '__main__':

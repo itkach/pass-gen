@@ -55,6 +55,9 @@ def format_ttc(seconds):
     else:
         return u'{}y'.format(days/365)
 
+def calc_ttc(combination_count, attempt_rate):
+    return combination_count/(2*attempt_rate)
+
 
 def main():
     args = get_args()
@@ -84,10 +87,10 @@ def main():
         for k in range(1, args.quantity + 1):
             password = generate(words, how_many=k)
             combination_count = word_count**k
-            ttc = (combination_count/args.attempt_rate)
+            ttc = calc_ttc(combination_count, args.attempt_rate)
             entropy = int(math.log(combination_count, 2))
             combination_count2 = len(char_counter)**len(password)
-            ttc2 = (combination_count2/args.attempt_rate)
+            ttc2 = calc_ttc(combination_count2, args.attempt_rate)
             entropy2 = int(math.log(combination_count2, 2))
             print fmt.format(entropy, entropy2,
                              format_ttc(min(ttc, ttc2)), password)

@@ -7,6 +7,7 @@ import re
 
 from collections import Counter
 
+
 def generate(words, how_many=4):
     return ' '.join([random.choice(words) for _ in range(how_many)])
 
@@ -20,11 +21,11 @@ def get_args():
     parser.add_argument('-m', '--min-word-length',
                         type=int,
                         default=2,
-                        help='Do not use words shorter then this. Default: %(default)s)')
+                        help='Do not use words shorter then this. Default: %(default)d)')
     parser.add_argument('-M', '--max-word-length',
                         type=int,
                         default=6,
-                        help='Do not use words longer then this. Default: %(default)s)')
+                        help='Do not use words longer then this. Default: %(default)d)')
     parser.add_argument('-e', '--encoding',
                         default='utf-8',
                         help='Word file encoding. Default: %(default)s)')
@@ -32,7 +33,27 @@ def get_args():
                         default='^[a-z]+$',
                         help=('Allow only words that match this regular expression. '
                               'Default: %(default)s'))
+    parser.add_argument('-s', '--attempt-rate',
+                        default=10**8,
+                        type=int,
+                        help=('Assume this many brute force attemps per second when '
+                              'calculating time to crack'
+                              'Default: %(default)d'))
+    parser.add_argument('-q', '--quantity',
+                        default=4,
+                        type=int,
+                        help=('Number of words to include in password'
+                              'Default: %(default)d'))
+
+
     return parser.parse_args()
+
+def format_ttc(seconds):
+    days = seconds/(60*60*24)
+    if days < 365:
+        return u'{}d'.format(days)
+    else:
+        return u'{}y'.format(days/365)
 
 
 def main():
@@ -48,26 +69,28 @@ def main():
         for word in words:
             char_counter.update(word)
 
-        print u'Found alphabet of {} characters:'.format(len(char_counter))
+        print u'\nFound alphabet of {} characters:\n'.format(len(char_counter))
         for k, v in sorted(char_counter.items()):
             print u'{} {}'.format(k, v)
 
-        print ''
         word_count = len(words)
+        print u'\nFound %d words\n' % word_count
 
-        print u'Found %d words' % word_count
-        print ''
-
-        fmt = u'{:>3} {:>3} {}'
-        header = u'E1  E2  PASSWORD'
+        fmt = u'{:>3} {:>3} {:>7} {}'
+        header = u'E1  E2  TTC      PASSWORD'
         print header
         print u'-'*len(header)
 
-        for k in range(1, 6):
+        for k in range(1, args.quantity + 1):
             password = generate(words, how_many=k)
-            entropy = int(math.log(word_count**k, 2))
-            entropy2 = int(math.log(len(char_counter)**len(password), 2))
-            print fmt.format(entropy, entropy2, password)
+            combination_count = word_count**k
+            ttc = (combination_count/args.attempt_rate)
+            entropy = int(math.log(combination_count, 2))
+            combination_count2 = len(char_counter)**len(password)
+            ttc2 = (combination_count2/args.attempt_rate)
+            entropy2 = int(math.log(combination_count2, 2))
+            print fmt.format(entropy, entropy2,
+                             format_ttc(min(ttc, ttc2)), password)
 
 
 if __name__ == '__main__':

@@ -49,14 +49,20 @@ def get_args():
     return parser.parse_args()
 
 def format_ttc(seconds):
-    days = seconds/(60*60*24)
+    days = int(seconds/(60*60*24))
     if days < 365:
         return u'{:n}d'.format(days)
     else:
-        return u'{:n}y'.format(days/365)
+        return u'{:n}y'.format(int(days/365))
 
 def calc_ttc(combination_count, attempt_rate):
     return combination_count/(2*attempt_rate)
+
+
+def maybe_decode(thing, encoding):
+    if hasattr(thing, 'decode'):
+        return thing.decode(encoding)
+    return thing
 
 
 def main():
@@ -64,7 +70,7 @@ def main():
     char_counter = Counter()
     with open(args.word_file) as f:
         filter_re = re.compile(args.word_filter)
-        words = [word.decode(args.encoding) for word
+        words = [maybe_decode(word, args.encoding) for word
                  in (line.strip() for line in f)
                  if args.min_word_length <= len(word) <= args.max_word_length
                  and filter_re.match(word)]
@@ -72,17 +78,17 @@ def main():
         for word in words:
             char_counter.update(word)
 
-        print u'\nFound alphabet of {:n} characters:\n'.format(len(char_counter))
+        print(u'\nFound alphabet of {:n} characters:\n'.format(len(char_counter)))
         for k, v in sorted(char_counter.items()):
-            print u'{} {:>5n}'.format(k, v)
+            print(u'{} {:>5n}'.format(k, v))
 
         word_count = len(words)
-        print u'\nFound %d words\n' % word_count
+        print(u'\nFound {:n} words\n'.format(word_count))
 
         fmt = u'{:>3n} {:>3n} {:>7} {}'
         header = u'E1  E2  TTC      PASSWORD'
-        print header
-        print u'-'*len(header)
+        print(header)
+        print(u'-'*len(header))
 
         for k in range(1, args.quantity + 1):
             password = generate(words, how_many=k)
@@ -92,11 +98,11 @@ def main():
             combination_count2 = len(char_counter)**len(password)
             ttc2 = calc_ttc(combination_count2, args.attempt_rate)
             entropy2 = int(math.log(combination_count2, 2))
-            print fmt.format(entropy, entropy2,
-                             format_ttc(min(ttc, ttc2)), password)
+            print(fmt.format(entropy, entropy2,
+                             format_ttc(min(ttc, ttc2)), password))
 
-    print (u'\nTime to crack calculation assumes {:n} attemps per second'
-           .format(args.attempt_rate))
+    print(u'\nTime to crack calculation assumes {:n} attemps per second'
+          .format(args.attempt_rate))
 
 
 

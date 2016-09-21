@@ -51,9 +51,9 @@ def get_args():
 def format_ttc(seconds):
     days = seconds/(60*60*24)
     if days < 365:
-        return u'{}d'.format(days)
+        return u'{:n}d'.format(days)
     else:
-        return u'{}y'.format(days/365)
+        return u'{:n}y'.format(days/365)
 
 def calc_ttc(combination_count, attempt_rate):
     return combination_count/(2*attempt_rate)
@@ -72,14 +72,14 @@ def main():
         for word in words:
             char_counter.update(word)
 
-        print u'\nFound alphabet of {} characters:\n'.format(len(char_counter))
+        print u'\nFound alphabet of {:n} characters:\n'.format(len(char_counter))
         for k, v in sorted(char_counter.items()):
-            print u'{} {}'.format(k, v)
+            print u'{} {:>5n}'.format(k, v)
 
         word_count = len(words)
         print u'\nFound %d words\n' % word_count
 
-        fmt = u'{:>3} {:>3} {:>7} {}'
+        fmt = u'{:>3n} {:>3n} {:>7} {}'
         header = u'E1  E2  TTC      PASSWORD'
         print header
         print u'-'*len(header)
@@ -94,6 +94,10 @@ def main():
             entropy2 = int(math.log(combination_count2, 2))
             print fmt.format(entropy, entropy2,
                              format_ttc(min(ttc, ttc2)), password)
+
+    print (u'\nTime to crack calculation assumes {:n} attemps per second'
+           .format(args.attempt_rate))
+
 
 
 if __name__ == '__main__':

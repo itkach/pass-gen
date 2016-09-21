@@ -32,7 +32,7 @@ def main():
     with open(args.word_file) as f:
         words = [word for word in (line.strip() for line in f)
                  if args.min_word_length <= len(word) <= args.max_word_length
-                 and not word[0].isupper()]
+                 and not word[0].isupper() and not '\'' in word]
 
         word_count = len(words)
 

@@ -102,7 +102,7 @@ def main():
             print(fmt.format(entropy, entropy2,
                              format_ttc(min(ttc, ttc2)), password))
 
-    print(u'\nTime to crack calculation assumes {:n} attemps per second'
+    print(u'\nTime to crack calculation assumes {:n} attempts per second'
           .format(args.attempt_rate))
 
 
